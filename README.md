@@ -46,7 +46,9 @@ The service provides an endpoint that will determine, from a set of recipes, wha
 Accomplishments:
 
 1. I have refactored most of the codes and restructured the packages.
+![alt text](https://github.com/eallanjoseph123/java-tech-task/blob/master/docs/rezdy-package-structure.png?raw=true)
 2. Added SWAGGER for the API documentation.
+![alt text](https://github.com/eallanjoseph123/java-tech-task/blob/master/docs/swagger.png?raw=true)
 3. Created Unit test for both Controller and Service using TDD.
 4. put some comments in codes.
 5. I used Spring data JPA to replace the LunchService::loadRecipes
@@ -59,6 +61,10 @@ Run the application
 1. sudo docker-compse up
 2. mvn spring-boot:run 
 3. go to your browser and browse http://localhost:8080/swagger-ui.html#/
+
+
+
+
 
 Issues:
 
