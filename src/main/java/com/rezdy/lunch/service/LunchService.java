@@ -1,51 +1,105 @@
 package com.rezdy.lunch.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.rezdy.lunch.dto.RecipeDto;
+import com.rezdy.lunch.repository.RecipeRepository;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class LunchService {
 
-    @Autowired
-    private EntityManager entityManager;
 
-    private List<Recipe> recipesSorted;
+	private final RecipeRepository recipeRepository;
+	
+	/**
+	 * Non expired recipes accordingly to the date supplied
+	 * @param date
+	 * @return
+	 */
+	
+	public List<RecipeDto> getNonExpiredRecipesOnDate(final String date) {
+		List<RecipeDto> result = null;
+		try {
+			result = recipeRepository.findAllRecipesWitValidDate(LocalDate.parse(date)).stream().map(recipe->{
+				RecipeDto dto = RecipeDto.builder().build();
+				dto.copy(recipe);
+				return dto;
+			}).collect(Collectors.toList());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 
-    public List<Recipe> getNonExpiredRecipesOnDate(LocalDate date) {
-        List<Recipe> recipes = loadRecipes(date);
+		if (null == result || result.size() == 0) {
+			throw new RuntimeException("No Recipes are available for your selected Date " + date.toString());
+		}
 
-        sortRecipes(recipes);
+		return result;
+	}
 
-        return recipesSorted;
-    }
 
-    private void sortRecipes(List<Recipe> recipes) {
-        recipesSorted = recipes; //TODO sort recipes considering best-before
-    }
+	/**
+	 * Will return all recipes based on the param date.
+	 * 
+	 * @param date this is the useByDate
+	 * @return
+	 */
+	
+	public List<RecipeDto> getAllRecipesByDate(final String date) {
+		List<RecipeDto> result = null;
+		try {
+			result = recipeRepository.findAllRecipesByDate(LocalDate.parse(date))
+					.stream().map(recipe->{
+						RecipeDto dto = RecipeDto.builder().build();
+						dto.copy(recipe);
+						return dto;
+					}).collect(Collectors.toList());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 
-    public List<Recipe> loadRecipes(LocalDate date) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Recipe> criteriaQuery = cb.createQuery(Recipe.class);
-        Root<Recipe> recipeRoot = criteriaQuery.from(Recipe.class);
+		if (null == result || result.size() == 0) {
+			throw new RuntimeException("No Recipes are available for your selected Date " + date.toString());
+		}
 
-        CriteriaQuery<Recipe> query = criteriaQuery.select(recipeRoot);
+		return result;
+	}
 
-        Subquery<Recipe> nonExpiredIngredientSubquery = query.subquery(Recipe.class);
-        Root<Recipe> nonExpiredIngredient = nonExpiredIngredientSubquery.from(Recipe.class);
-        nonExpiredIngredientSubquery.select(nonExpiredIngredient);
+	
+	/**
+	 * Recipes with Valid use by and sorted ingredients
+	 * @param dateUseBy
+	 * @param dateForBestBefore
+	 * @return
+	 */
+	public List<RecipeDto> getAllRecipeWithSortedIngredients(String dateUseBy, String dateForBestBefore) {
+		List<RecipeDto> result = null;
+		try {
+			LocalDate useBy = LocalDate.parse(dateUseBy);
+			LocalDate bestBefore = LocalDate.parse(dateForBestBefore);
+			result = recipeRepository.findAllRecipesWithValidUseByAndAfterBestBefore(useBy,bestBefore)
+					.stream().map(recipe->{
+						RecipeDto dto = RecipeDto.builder().build();
+						dto.copy(recipe);
+						return dto;
+					}).collect(Collectors.toList());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 
-        Predicate matchingRecipe = cb.equal(nonExpiredIngredient.get("title"), recipeRoot.get("title"));
-        Predicate expiredIngredient = cb.lessThan(nonExpiredIngredient.join("ingredients").get("useBy"), date);
+		if (null == result || result.size() == 0) {
+			throw new RuntimeException("No Recipes are available for your selected Date");
+		}
 
-        Predicate allNonExpiredIngredients = cb.exists(nonExpiredIngredientSubquery.where(matchingRecipe, expiredIngredient));
-
-        return entityManager.createQuery(query.where(allNonExpiredIngredients)).getResultList();
-    }
+		return result;
+	}
 
 }

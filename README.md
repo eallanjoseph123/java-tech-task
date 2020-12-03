@@ -34,3 +34,32 @@ The service provides an endpoint that will determine, from a set of recipes, wha
     ```
     
 3. Run Springboot LunchApplication
+
+
+#Tech
+
+1. Springboot
+2. Mysql
+3. Swagger
+4. RestAPI
+
+Accomplishments:
+
+1. I have refactored most of the codes and restructured the packages.
+2. Added SWAGGER for the API documentation.
+3. Created Unit test for both Controller and Service using TDD.
+4. put some comments in codes.
+5. I used Spring data JPA to replace the LunchService::loadRecipes
+6. Used lombok to remove boiler plate codes.
+
+Run the application
+
+0. mvn clean install -> run unit tests.
+   mvn clean install -DskipTests=True -> skip unit tests
+1. sudo docker-compse up
+2. mvn spring-boot:run 
+3. go to your browser and browse http://localhost:8080/swagger-ui.html#/
+
+Issues:
+
+1. The last criteria regarding the sorting not finish due to stackoverflow issue of JPA/Hibernate config.

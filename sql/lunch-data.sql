@@ -1,11 +1,11 @@
-CREATE TABLE ingredient (
+CREATE TABLE Ingredient (
     TITLE VARCHAR(256) NOT NULL,
     BEST_BEFORE DATE DEFAULT NULL,
     USE_BY DATE DEFAULT NULL,
     PRIMARY KEY (TITLE)
 );
 
-INSERT INTO ingredient (TITLE, BEST_BEFORE, USE_BY) VALUES
+INSERT INTO Ingredient (TITLE, BEST_BEFORE, USE_BY) VALUES
     ('Ham','2030-12-31','2030-01-01'),
     ('Cheese','1999-01-01','2030-01-01'),
     ('Bread','2030-12-31','2030-01-01'),
@@ -26,12 +26,12 @@ INSERT INTO ingredient (TITLE, BEST_BEFORE, USE_BY) VALUES
     ('Spinach','2030-12-31','1999-01-01'),
     ('Milk','2030-12-31','1999-01-01');
 
-CREATE TABLE recipe (
+CREATE TABLE Recipe (
      TITLE VARCHAR(256) NOT NULL,
      PRIMARY KEY (TITLE)
 );
 
-INSERT INTO recipe (title) VALUES
+INSERT INTO Recipe (title) VALUES
     ('Ham and Cheese Toastie'),
     ('Fry-up'),
     ('Salad'),
@@ -43,8 +43,8 @@ CREATE TABLE recipe_ingredient (
     recipe VARCHAR(256) NOT NULL,
     ingredient VARCHAR(256) NOT NULL,
     PRIMARY KEY (recipe, ingredient),
-    CONSTRAINT FK_recipe FOREIGN KEY (recipe) REFERENCES recipe (TITLE),
-    CONSTRAINT FK_ingredient FOREIGN KEY (ingredient) REFERENCES ingredient (TITLE)
+    CONSTRAINT FK_recipe FOREIGN KEY (recipe) REFERENCES Recipe (TITLE),
+    CONSTRAINT FK_ingredient FOREIGN KEY (ingredient) REFERENCES Ingredient (TITLE)
 );
 
 INSERT INTO recipe_ingredient (recipe, ingredient) VALUES
@@ -76,4 +76,3 @@ INSERT INTO recipe_ingredient (recipe, ingredient) VALUES
     ('Omelette','Milk'),
     ('Omelette','Spinach')
 ;
-
